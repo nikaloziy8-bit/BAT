@@ -876,14 +876,36 @@ async function submitSurvey() {
     answers_json: JSON.stringify(answers)
   };
   try {
-    // no-cors needed for GitHub Pages → Apps Script
-    await fetch(SCRIPT_URL, {
-      method: "POST",
-      mode: "no-cors",
-      headers: {"Content-Type":"application/json"},
-      body: JSON.stringify(payload)
-    });
-  } catch(e) { console.warn("Fetch error:", e); }
+    // Use form submission to bypass CORS
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = SCRIPT_URL;
+    form.target = 'hidden_iframe';
+    form.style.display = 'none';
+
+    // Flatten payload into form fields
+    for (const [key, val] of Object.entries(payload)) {
+      const input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = key;
+      input.value = typeof val === 'object' ? JSON.stringify(val) : val;
+      form.appendChild(input);
+    }
+
+    // Create hidden iframe to receive response
+    let iframe = document.getElementById('hidden_iframe');
+    if (!iframe) {
+      iframe = document.createElement('iframe');
+      iframe.name = 'hidden_iframe';
+      iframe.id = 'hidden_iframe';
+      iframe.style.display = 'none';
+      document.body.appendChild(iframe);
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
+  } catch(e) { console.warn("Submit error:", e); }
   renderPersonalResult(scores, risk);
   showPage('pg-done');
 }
