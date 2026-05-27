@@ -3,479 +3,1016 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Оценка выгорания — Playerok</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<title>Playerok — Оценка выгорания</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg: #0d0f17;
-    --surface: #131520;
-    --surface2: #1a1d2e;
-    --border: #252840;
-    --accent: #4C6EF5;
-    --accent-light: #748FFC;
-    --accent-glow: rgba(76,110,245,.25);
-    --danger: #e87c7c;
-    --success: #69db7c;
-    --warn: #ffd43b;
-    --text: #f0f0f8;
-    --muted: #7a7d9a;
-    --radius: 10px;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html { scroll-behavior: smooth; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    font-weight: 400;
-    min-height: 100vh;
-  }
-  .page { display: none; min-height: 100vh; }
-  .page.active { display: flex; flex-direction: column; }
+:root {
+  --blue: #2B5CE6;
+  --blue-dark: #1A3DB5;
+  --blue-light: #EEF3FF;
+  --blue-mid: #4A73F0;
+  --black: #0D0D0D;
+  --gray: #6B7280;
+  --gray-light: #F3F4F6;
+  --border: #E5E7EB;
+  --white: #FFFFFF;
+  --green: #16A34A;
+  --green-light: #DCFCE7;
+  --amber: #D97706;
+  --amber-light: #FEF3C7;
+  --orange: #EA580C;
+  --orange-light: #FFF7ED;
+  --red: #DC2626;
+  --red-light: #FEE2E2;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Inter', sans-serif;
+  background: #F8F9FB;
+  color: var(--black);
+  min-height: 100vh;
+  font-size: 15px;
+}
 
-  /* WELCOME */
-  #page-welcome {
-    align-items: center; justify-content: center; padding: 2rem;
-    background: radial-gradient(ellipse at 30% 40%, #0d1a4a 0%, var(--bg) 65%);
-  }
-  .welcome-card { max-width: 480px; width: 100%; text-align: center; }
-  .logo-mark {
-    display: flex; align-items: center; justify-content: center;
-    margin: 0 auto 2rem;
-  }
-  /* Playerok SVG logo inline */
-  .playerok-logo {
-    font-family: 'Inter', sans-serif; font-size: 2.2rem; font-weight: 900;
-    letter-spacing: -0.03em; line-height: 1;
-    display: flex; align-items: center; gap: 0;
-  }
-  .playerok-logo .pl { color: #4C6EF5; }
-  .playerok-logo .ok { color: #f0f0f8; font-weight: 700; }
-  .logo-icon {
-    width: 48px; height: 48px; border-radius: 10px;
-    background: #4C6EF5;
-    display: flex; align-items: center; justify-content: center;
-    margin-right: .7rem;
-    box-shadow: 0 0 28px rgba(76,110,245,.4);
-    position: relative; overflow: hidden;
-    flex-shrink: 0;
-  }
-  .logo-icon svg { width: 28px; height: 28px; }
-  .welcome-card h1 {
-    font-family: 'Inter', sans-serif; font-size: 1.85rem; font-weight: 800;
-    line-height: 1.2; margin-bottom: .5rem; color: var(--text);
-  }
-  .welcome-card .sub { color: var(--muted); font-size: .9rem; line-height: 1.65; margin-bottom: 2rem; }
-  .field-wrap { text-align: left; margin-bottom: 1rem; }
-  .field-label { display: block; font-size: .72rem; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin-bottom: .4rem; font-weight: 600; }
-  input[type="text"], input[type="password"] {
-    width: 100%; padding: .82rem 1.1rem;
-    background: var(--surface); border: 1.5px solid var(--border);
-    border-radius: var(--radius); color: var(--text);
-    font-family: 'Inter', sans-serif; font-size: .95rem; outline: none;
-    transition: border-color .2s, box-shadow .2s;
-  }
-  input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(76,110,245,.15); }
-  .btn {
-    display: inline-flex; align-items: center; justify-content: center;
-    gap: .4rem; padding: .82rem 1.8rem; border-radius: var(--radius);
-    font-family: 'Inter', sans-serif; font-size: .9rem; font-weight: 700;
-    cursor: pointer; border: none; transition: all .18s; text-decoration: none;
-    letter-spacing: .01em;
-  }
-  .btn-primary { background: var(--accent); color: #fff; width: 100%; }
-  .btn-primary:hover { background: var(--accent-light); transform: translateY(-1px); box-shadow: 0 6px 20px var(--accent-glow); }
-  .btn-ghost { background: transparent; border: 1.5px solid var(--border); color: var(--muted); width: 100%; }
-  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
-  .btn-sm { padding: .45rem .9rem; font-size: .8rem; width: auto; }
-  .btn-danger { background: linear-gradient(135deg, var(--danger), #b05555); color: #fff; }
-  .notice { font-size: .73rem; color: var(--muted); margin-top: 1rem; line-height: 1.55; }
-  .divider { border: none; border-top: 1px solid var(--border); margin: 1.4rem 0; }
-  .err-msg { color: var(--danger); font-size: .82rem; margin-top: .4rem; display: none; }
+.page { display: none; }
+.page.active { display: block; }
 
-  /* QUIZ */
-  .quiz-header {
-    position: sticky; top: 0;
-    background: rgba(13,15,23,.95); backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-    padding: .85rem 1.5rem;
-    display: flex; align-items: center; gap: 1rem; z-index: 10;
-  }
-  .quiz-header .htitle { font-family: 'Inter', sans-serif; font-size: .95rem; font-weight: 800; color: var(--accent); }
-  .prog-wrap { flex: 1; height: 3px; background: var(--border); border-radius: 99px; overflow: hidden; }
-  .prog-fill { height: 100%; background: var(--accent); border-radius: 99px; transition: width .35s ease; }
-  .prog-label { font-size: .78rem; color: var(--muted); white-space: nowrap; font-weight: 600; }
-  .quiz-body { flex: 1; padding: 2rem 1.5rem; max-width: 660px; margin: 0 auto; width: 100%; }
-  .scale-section { margin-bottom: 3rem; }
-  .scale-title { font-family: 'Inter', sans-serif; font-size: 1rem; font-weight: 800; color: var(--accent); margin-bottom: .25rem; letter-spacing: -.01em; }
-  .scale-desc { font-size: .8rem; color: var(--muted); margin-bottom: 1.5rem; line-height: 1.55; }
-  .q-card {
-    background: var(--surface); border: 1.5px solid var(--border);
-    border-radius: var(--radius); padding: 1.2rem 1.4rem; margin-bottom: .7rem;
-    transition: border-color .2s;
-  }
-  .q-card.answered { border-color: rgba(76,110,245,.4); }
-  .q-num { font-size: .68rem; color: var(--muted); margin-bottom: .3rem; letter-spacing: .06em; font-weight: 600; text-transform: uppercase; }
-  .q-text { font-size: .9rem; line-height: 1.55; margin-bottom: 1rem; font-weight: 400; }
-  .opts { display: flex; gap: .4rem; }
-  .opt {
-    flex: 1; padding: .5rem .2rem;
-    background: var(--surface2); border: 1.5px solid var(--border);
-    border-radius: 8px; color: var(--muted);
-    font-family: 'Inter', sans-serif; font-size: .78rem;
-    text-align: center; cursor: pointer; transition: all .14s; line-height: 1.3;
-  }
-  .opt:hover { border-color: var(--accent); color: var(--accent); background: rgba(76,110,245,.07); }
-  .opt.sel { background: rgba(76,110,245,.15); border-color: var(--accent); color: var(--accent-light); font-weight: 700; }
-  .opt-num { font-size: .88rem; font-weight: 700; display: block; }
-  .opt-lbl { font-size: .6rem; display: block; margin-top: 1px; }
-  .quiz-footer {
-    padding: 1rem 1.5rem; border-top: 1px solid var(--border);
-    display: flex; align-items: center; justify-content: flex-end; gap: 1rem;
-    max-width: 660px; margin: 0 auto; width: 100%;
-  }
-  .quiz-footer .btn { width: auto; }
-  #quiz-err { color: var(--danger); font-size: .82rem; margin-right: auto; }
+/* ─── HEADER ─── */
+.header {
+  background: var(--white);
+  border-bottom: 1px solid var(--border);
+  padding: 0 1.5rem;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+.logo-icon {
+  width: 36px;
+  height: 36px;
+  background: var(--blue);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.logo-pl {
+  font-size: 18px;
+  font-weight: 800;
+  color: white;
+  line-height: 1;
+  letter-spacing: -1.5px;
+}
+.logo-text {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+.logo-text span { color: var(--blue); }
+.logo-text b { color: var(--black); font-weight: 800; }
+.header-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--blue);
+  background: var(--blue-light);
+  padding: 4px 10px;
+  border-radius: 20px;
+  letter-spacing: .02em;
+}
 
-  /* RESULT */
-  #page-result {
-    align-items: center; justify-content: center; padding: 2rem;
-    background: radial-gradient(ellipse at 70% 30%, #0d1a4a 0%, var(--bg) 65%);
-  }
-  .result-card { max-width: 540px; width: 100%; }
-  .result-card h2 {
-    font-family: 'Inter', sans-serif; font-size: 1.8rem; font-weight: 800; margin-bottom: .3rem;
-    color: var(--text); letter-spacing: -.02em;
-  }
-  .result-card .intro { color: var(--muted); font-size: .87rem; margin-bottom: 1.4rem; line-height: 1.55; }
-  .overall-badge {
-    display: inline-flex; align-items: center; gap: .5rem;
-    padding: .45rem 1rem; border-radius: 99px;
-    font-size: .85rem; font-weight: 700; margin-bottom: 1.8rem;
-  }
-  .overall-badge.low    { background: rgba(105,219,124,.1); border: 1px solid rgba(105,219,124,.3); color: var(--success); }
-  .overall-badge.medium { background: rgba(255,212,59,.1);  border: 1px solid rgba(255,212,59,.3);  color: var(--warn); }
-  .overall-badge.high   { background: rgba(232,124,124,.1); border: 1px solid rgba(232,124,124,.3); color: var(--danger); }
-  .scales-grid { display: grid; gap: .7rem; margin-bottom: 1.8rem; }
-  .sbar { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 1rem 1.3rem; }
-  .sbar-head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: .6rem; }
-  .sbar-name { font-size: .87rem; font-weight: 600; }
-  .sbar-score { font-size: .78rem; color: var(--muted); font-weight: 500; }
-  .bar-track { height: 5px; background: var(--border); border-radius: 99px; overflow: hidden; }
-  .bar-fill { height: 100%; border-radius: 99px; transition: width .8s cubic-bezier(.4,0,.2,1); }
-  .bar-fill.low    { background: var(--success); }
-  .bar-fill.medium { background: var(--warn); }
-  .bar-fill.high   { background: var(--danger); }
-  .sbar-lv { font-size: .7rem; color: var(--muted); margin-top: .3rem; }
-  .result-actions { display: flex; gap: .8rem; flex-wrap: wrap; }
-  .result-actions .btn { flex: 1; min-width: 150px; }
+/* ─── CONTAINER ─── */
+.container { max-width: 680px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
 
-  /* ADMIN LOGIN */
-  #page-admin-login {
-    align-items: center; justify-content: center; padding: 2rem;
-    background: radial-gradient(ellipse at 50% 50%, #0d1a4a 0%, var(--bg) 70%);
-  }
-  .adm-login-card { max-width: 360px; width: 100%; text-align: center; }
-  .adm-login-card h2 { font-family: 'Inter', sans-serif; font-size: 1.6rem; font-weight: 800; margin-bottom: .4rem; letter-spacing: -.02em; }
-  .adm-login-card .sub { color: var(--muted); font-size: .85rem; margin-bottom: 1.6rem; }
+/* ─── INTRO ─── */
+.intro-hero {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2.5rem;
+  margin-bottom: 1.25rem;
+}
+.intro-logo-big {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 2rem;
+}
+.logo-icon-big {
+  width: 56px;
+  height: 56px;
+  background: var(--blue);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.logo-pl-big {
+  font-size: 28px;
+  font-weight: 800;
+  color: white;
+  line-height: 1;
+  letter-spacing: -2px;
+}
+.intro-logo-name {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+.intro-logo-name .blue { color: var(--blue); }
+.intro-logo-name .dark { color: var(--black); }
+.intro-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: .75rem;
+  letter-spacing: -.3px;
+  line-height: 1.3;
+}
+.intro-desc {
+  font-size: 14px;
+  color: var(--gray);
+  line-height: 1.65;
+  margin-bottom: 1.5rem;
+}
+.anon-badge {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background: var(--blue-light);
+  border: 1px solid #C7D8FF;
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin-bottom: 1.5rem;
+}
+.anon-icon {
+  width: 18px;
+  height: 18px;
+  background: var(--blue);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.anon-icon svg { width: 10px; height: 10px; fill: white; }
+.anon-text { font-size: 13px; color: #1A3DB5; line-height: 1.5; }
+.anon-text strong { font-weight: 600; }
+.meta-row {
+  display: flex;
+  gap: .75rem;
+  margin-bottom: 1.75rem;
+}
+.meta-pill {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: var(--gray-light);
+  border-radius: 20px;
+  font-size: 12px;
+  color: var(--gray);
+  font-weight: 500;
+}
+.meta-pill strong { color: var(--black); }
 
-  /* ADMIN */
-  #page-admin { flex-direction: column; }
-  .adm-header {
-    background: var(--surface); border-bottom: 1px solid var(--border);
-    padding: .9rem 1.5rem; display: flex; align-items: center; gap: .6rem; flex-wrap: wrap;
-  }
-  .adm-header h2 { font-family: 'Inter', sans-serif; font-size: 1.1rem; font-weight: 800; flex: 1; min-width: 160px; letter-spacing: -.01em; }
-  .adm-body { flex: 1; padding: 1.5rem; overflow-x: auto; }
-  .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px,1fr)); gap: .8rem; margin-bottom: 1.5rem; }
-  .stat-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 1rem 1.2rem; }
-  .stat-num { font-family: 'Inter', sans-serif; font-size: 1.9rem; color: var(--accent); font-weight: 800; }
-  .stat-label { font-size: .73rem; color: var(--muted); margin-top: .15rem; font-weight: 500; }
-  .tbl-wrap { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); overflow: hidden; }
-  table { width: 100%; border-collapse: collapse; font-size: .82rem; }
-  thead th {
-    background: var(--surface2); padding: .75rem .9rem; text-align: left;
-    font-size: .68rem; letter-spacing: .07em; text-transform: uppercase;
-    color: var(--muted); border-bottom: 1px solid var(--border); white-space: nowrap; font-weight: 700;
-  }
-  tbody tr { border-bottom: 1px solid var(--border); transition: background .14s; }
-  tbody tr:last-child { border-bottom: none; }
-  tbody tr:hover { background: var(--surface2); }
-  tbody td { padding: .75rem .9rem; vertical-align: middle; }
-  .chip { display: inline-block; padding: .2rem .6rem; border-radius: 99px; font-size: .7rem; font-weight: 700; }
-  .chip.low    { background: rgba(105,219,124,.15); color: var(--success); }
-  .chip.medium { background: rgba(255,212,59,.15);  color: var(--warn); }
-  .chip.high   { background: rgba(232,124,124,.15); color: var(--danger); }
-  .empty-state { text-align: center; padding: 3rem; color: var(--muted); font-size: .88rem; line-height: 1.6; }
-  .info-box {
-    background: rgba(76,110,245,.07); border: 1px solid rgba(76,110,245,.2);
-    border-radius: var(--radius); padding: 1rem 1.2rem;
-    font-size: .82rem; color: var(--muted); line-height: 1.6; margin-bottom: 1.2rem;
-  }
-  .info-box a { color: var(--accent-light); text-decoration: none; }
-  .info-box a:hover { text-decoration: underline; }
+/* ─── FORM ─── */
+.field { margin-bottom: 1.25rem; }
+.field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gray);
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+.field input {
+  width: 100%;
+  padding: 13px 16px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  color: var(--black);
+  transition: border-color .2s;
+  outline: none;
+}
+.field input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(43,92,230,.1); }
+.field input::placeholder { color: #B0B8C4; }
 
-  @media (max-width: 560px) {
-    .welcome-card h1 { font-size: 1.6rem; }
-    .opts { gap: .25rem; }
-    .opt-lbl { display: none; }
-  }
-  @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
-  .fade-in { animation: fadeUp .45s ease both; }
+.btn-start {
+  width: 100%;
+  padding: 15px;
+  background: var(--blue);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s, transform .1s;
+  letter-spacing: .01em;
+}
+.btn-start:hover { background: var(--blue-dark); }
+.btn-start:active { transform: scale(.99); }
+
+/* ─── ALL-ON-ONE PAGE SURVEY ─── */
+.survey-intro-bar {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.survey-user { font-size: 14px; font-weight: 600; }
+.survey-user span { color: var(--gray); font-weight: 400; font-size: 13px; margin-left: 6px; }
+.scale-hint {
+  font-size: 12px;
+  color: var(--gray);
+  text-align: right;
+  line-height: 1.4;
+}
+
+.section-block {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+.section-head {
+  padding: .75rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #FAFBFD;
+}
+.section-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.section-name {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  color: var(--gray);
+}
+.section-count { font-size: 11px; color: #B0B8C4; margin-left: auto; }
+
+.q-row {
+  padding: .9rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 1rem;
+  align-items: center;
+  transition: background .1s;
+}
+.q-row:last-child { border-bottom: none; }
+.q-row.answered { background: #FAFFFE; }
+.q-row.unanswered-err { background: #FFF5F5; }
+.q-num-text { display: flex; gap: 8px; align-items: flex-start; }
+.q-num { font-size: 11px; color: #B0B8C4; font-weight: 600; flex-shrink: 0; margin-top: 2px; min-width: 18px; }
+.q-text { font-size: 14px; line-height: 1.5; color: var(--black); }
+.scale-btns { display: flex; gap: 5px; flex-shrink: 0; }
+.sb {
+  width: 36px;
+  height: 36px;
+  border: 1.5px solid var(--border);
+  border-radius: 6px;
+  background: var(--gray-light);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--gray);
+  cursor: pointer;
+  transition: all .15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sb:hover { border-color: var(--blue-mid); color: var(--blue); background: var(--blue-light); }
+.sb.sel { background: var(--blue); border-color: var(--blue); color: white; }
+
+/* ─── SUBMIT BAR ─── */
+.submit-bar {
+  position: sticky;
+  bottom: 0;
+  background: var(--white);
+  border-top: 1px solid var(--border);
+  padding: 1rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  z-index: 50;
+  margin-top: 1.5rem;
+}
+.progress-info { font-size: 13px; color: var(--gray); }
+.progress-info strong { color: var(--black); font-weight: 600; }
+.btn-submit {
+  padding: 12px 28px;
+  background: var(--blue);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-family: 'Inter', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s;
+  white-space: nowrap;
+}
+.btn-submit:hover { background: var(--blue-dark); }
+.btn-submit:disabled { opacity: .4; cursor: not-allowed; }
+.err-msg {
+  font-size: 13px;
+  color: var(--red);
+  background: var(--red-light);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  margin-bottom: 1rem;
+  display: none;
+}
+
+/* ─── SENDING ─── */
+.sending-wrap {
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 1rem;
+  color: var(--gray);
+  font-size: 14px;
+}
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--border);
+  border-top-color: var(--blue);
+  border-radius: 50%;
+  animation: spin .7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── DONE PAGE ─── */
+.done-wrap { max-width: 560px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+.result-hero {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: center;
+  margin-bottom: 1rem;
+}
+.result-name { font-size: 14px; color: var(--gray); margin-bottom: 1.25rem; }
+.result-badge {
+  display: inline-block;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  margin-bottom: 1rem;
+  border: 1px solid;
+}
+.result-score { font-size: 52px; font-weight: 800; line-height: 1; margin-bottom: .25rem; letter-spacing: -2px; }
+.result-level { font-size: 18px; font-weight: 600; margin-bottom: .25rem; }
+.result-of5 { font-size: 13px; color: var(--gray); }
+
+.dim-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  margin-bottom: 1rem;
+}
+.dim-card-title { font-size: 12px; font-weight: 600; color: var(--gray); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 1rem; }
+.dim-row2 { margin-bottom: .9rem; }
+.dim-row2:last-child { margin-bottom: 0; }
+.dim-header { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 5px; }
+.dim-lbl { color: var(--gray); }
+.dim-val { font-weight: 600; }
+.dim-track { height: 6px; background: var(--border); border-radius: 3px; overflow: hidden; }
+.dim-fill { height: 100%; border-radius: 3px; transition: width .8s cubic-bezier(.4,0,.2,1); }
+.result-note {
+  background: var(--blue-light);
+  border: 1px solid #C7D8FF;
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.25rem;
+  font-size: 13px;
+  color: #1A3DB5;
+  line-height: 1.6;
+  margin-bottom: 1rem;
+}
+
+/* ─── ADMIN ─── */
+.admin-container { max-width: 780px; margin: 0 auto; padding: 2rem 1.25rem 4rem; }
+.page-title { font-size: 20px; font-weight: 700; margin-bottom: 1.5rem; letter-spacing: -.3px; }
+.stat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; margin-bottom: 1.5rem; }
+.stat-card {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.25rem;
+}
+.stat-num { font-size: 28px; font-weight: 800; letter-spacing: -1px; line-height: 1; margin-bottom: 4px; }
+.stat-lbl { font-size: 12px; color: var(--gray); }
+.filter-bar { display: flex; gap: 8px; margin-bottom: 1.25rem; flex-wrap: wrap; align-items: center; }
+.filter-bar select, .filter-bar button {
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--white);
+  font-family: 'Inter', sans-serif;
+  font-size: 13px;
+  color: var(--black);
+  cursor: pointer;
+  font-weight: 500;
+}
+.filter-bar button { background: var(--blue-light); color: var(--blue); border-color: #C7D8FF; }
+.filter-bar button:hover { background: var(--blue); color: white; }
+.r-card2 {
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.25rem;
+  margin-bottom: .75rem;
+  cursor: pointer;
+  transition: border-color .15s;
+}
+.r-card2:hover { border-color: var(--blue-mid); }
+.rc-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: .5rem; }
+.rc-name { font-size: 15px; font-weight: 600; }
+.rc-date { font-size: 11px; color: var(--gray); }
+.rc-sub { display: flex; gap: 8px; align-items: center; margin-bottom: .75rem; }
+.badge2 { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; border: 1px solid; }
+.mini-bars { display: flex; flex-direction: column; gap: 5px; }
+.mbar-row { display: flex; align-items: center; gap: 8px; }
+.mbar-lbl { font-size: 11px; color: var(--gray); width: 130px; flex-shrink: 0; }
+.mbar-track { flex: 1; height: 4px; background: var(--border); border-radius: 2px; }
+.mbar-fill { height: 100%; border-radius: 2px; }
+.mbar-val { font-size: 11px; color: var(--gray); width: 24px; text-align: right; }
+.empty { text-align: center; padding: 3rem; color: var(--gray); font-size: 14px; }
+.back-link { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: var(--gray); cursor: pointer; margin-bottom: 1.25rem; font-weight: 500; }
+.back-link:hover { color: var(--black); }
+.resp-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.resp-table th { text-align: left; padding: 8px; border-bottom: 1px solid var(--border); color: var(--gray); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.resp-table td { padding: 8px; border-bottom: 1px solid var(--gray-light); vertical-align: top; line-height: 1.4; }
+.warn-box { background: var(--red-light); border: 1px solid #FCA5A5; border-radius: var(--radius-sm); padding: 8px 12px; font-size: 13px; color: var(--red); margin-bottom: 1rem; display: none; }
+
+/* ─── Login ─── */
+.login-wrap { min-height: 80vh; display: flex; align-items: center; justify-content: center; }
+.login-card { background: var(--white); border: 1px solid var(--border); border-radius: 16px; padding: 2rem; width: 100%; max-width: 360px; }
+.login-title { font-size: 18px; font-weight: 700; margin-bottom: 1.5rem; }
+
+@media (max-width: 560px) {
+  .q-row { grid-template-columns: 1fr; gap: .6rem; }
+  .scale-btns { justify-content: flex-start; }
+  .sb { width: 40px; height: 40px; font-size: 14px; }
+  .intro-hero { padding: 1.5rem; }
+  .stat-grid { grid-template-columns: repeat(3,1fr); }
+  .stat-num { font-size: 22px; }
+  .survey-intro-bar { flex-direction: column; align-items: flex-start; gap: .5rem; }
+  .scale-hint { text-align: left; }
+}
 </style>
 </head>
 <body>
 
-<!-- WELCOME -->
-<div id="page-welcome" class="page active">
-  <div class="welcome-card fade-in">
-    <div class="logo-mark">BAT</div>
-    <h1>Оценка профессионального выгорания</h1>
-    <p class="sub">Тест займёт около 5–7 минут. Ваши ответы конфиденциальны и используются только для подготовки тренинга.</p>
-    <div class="field-wrap">
-      <label class="field-label" for="resp-name">Ваше имя и фамилия</label>
-      <input type="text" id="resp-name" placeholder="Иван Иванов" autocomplete="name">
-      <div class="err-msg" id="name-err">Пожалуйста, введите ваше имя.</div>
+<!-- ════════════ INTRO ════════════ -->
+<div id="pg-intro" class="page active">
+  <div class="header">
+    
+    <div class="header-badge">Тест на выгорание</div>
+  </div>
+  <div class="container">
+    <div class="intro-hero">
+      
+        <div>
+          <div class="intro-logo-name"><span class="blue">Player</span><span class="dark">ok</span></div>
+          <div style="font-size:12px;color:var(--gray);margin-top:2px">Исследование команды</div>
+        </div>
+      </div>
+
+      <div class="intro-title">Burnout Assessment Tool<br><span style="color:var(--blue)">Оценка профессионального выгорания</span></div>
+      <p class="intro-desc">Опросник помогает определить уровень профессионального выгорания по 6 ключевым шкалам. Результаты используются для планирования тренинга и программ поддержки.</p>
+
+      <div class="anon-badge">
+        <div class="anon-icon">
+          <svg viewBox="0 0 10 10"><path d="M5 1a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm0 5c2.2 0 4 .9 4 2v.5H1V8c0-1.1 1.8-2 4-2z"/></svg>
+        </div>
+        <div class="anon-text">
+          <strong>Анонимность гарантирована.</strong> Результаты вашего теста знаете только вы и организатор тренинга. Данные используются исключительно в обобщённом виде.
+        </div>
+      </div>
+
+      <div class="meta-row">
+        <div class="meta-pill"><strong>26</strong> вопросов</div>
+        <div class="meta-pill"><strong>~5</strong> минут</div>
+        <div class="meta-pill"><strong>6</strong> шкал BAT</div>
+      </div>
+
+      <div class="field">
+        <label>Ваше имя</label>
+        <input type="text" id="resp-name" placeholder="Иванов Иван Иванович" autocomplete="name">
+      </div>
+      <div class="field">
+        <label>Отдел</label>
+        <input type="text" id="resp-dept" placeholder="Поддержка, Сделки…">
+      </div>
+      <button class="btn-start" onclick="startSurvey()">Начать тестирование →</button>
     </div>
-    <button class="btn btn-primary" onclick="startQuiz()">Начать тест →</button>
-    <p class="notice">Нажимая «Начать тест», вы соглашаетесь с анонимной обработкой ваших ответов в рамках корпоративного исследования.</p>
-    <hr class="divider">
-    <button class="btn btn-ghost" onclick="showPage('page-admin-login')" style="font-size:.82rem;">
-      🔐 Войти в панель администратора
-    </button>
   </div>
 </div>
 
-<!-- QUIZ -->
-<div id="page-quiz" class="page">
-  <header class="quiz-header">
-    <span class="htitle">BAT</span>
-    <div class="prog-wrap"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
-    <span class="prog-label" id="prog-label">0 / 23</span>
-  </header>
-  <div class="quiz-body" id="quiz-body"></div>
-  <div class="quiz-footer">
-    <span id="quiz-err"></span>
-    <button class="btn btn-primary" onclick="submitQuiz()">Завершить тест →</button>
+<!-- ════════════ SURVEY (all on one page) ════════════ -->
+<div id="pg-survey" class="page">
+  <div class="header">
+    
+    <div id="survey-progress-text" class="header-badge">0 / 23</div>
   </div>
-</div>
 
-<!-- RESULT -->
-<div id="page-result" class="page">
-  <div class="result-card fade-in">
-    <h2>Ваши результаты</h2>
-    <p class="intro" id="res-name-line"></p>
-    <div id="res-badge"></div>
-    <div class="scales-grid" id="res-scales"></div>
-    <div class="result-actions">
-      <button class="btn btn-ghost" onclick="resetForm()">← Пройти снова</button>
+  <div class="container">
+    <div class="survey-intro-bar">
+      <div>
+        <div class="survey-user" id="survey-user-name"></div>
+      </div>
+      <div class="scale-hint">1 — Никогда &nbsp;·&nbsp; 3 — Иногда &nbsp;·&nbsp; 5 — Всегда</div>
+    </div>
+
+    <div id="err-msg" class="err-msg">Пожалуйста, ответьте на все выделенные вопросы перед отправкой.</div>
+    <div id="questions-container"></div>
+
+    <div class="submit-bar">
+      <div class="progress-info">Отвечено: <strong id="answered-count">0</strong> из 26</div>
+      <button class="btn-submit" onclick="submitSurvey()">Отправить результаты →</button>
     </div>
   </div>
 </div>
 
-<!-- ADMIN LOGIN -->
-<div id="page-admin-login" class="page">
-  <div class="adm-login-card fade-in">
-    <div class="logo-mark" style="width:52px;height:52px;font-size:1.1rem;margin-bottom:1.4rem;">🔐</div>
-    <h2>Панель администратора</h2>
-    <p class="sub">Введите пароль для доступа к результатам</p>
-    <div class="field-wrap" style="text-align:left">
-      <label class="field-label" for="adm-pass">Пароль</label>
-      <input type="password" id="adm-pass" placeholder="••••••••"
-             onkeydown="if(event.key==='Enter') checkAdminPass()">
-      <div class="err-msg" id="adm-err">Неверный пароль. Попробуйте снова.</div>
-    </div>
-    <button class="btn btn-primary" onclick="checkAdminPass()">Войти</button>
-    <hr class="divider">
-    <button class="btn btn-ghost" onclick="showPage('page-welcome')" style="font-size:.82rem;">← Назад</button>
+<!-- ════════════ SENDING ════════════ -->
+<div id="pg-sending" class="page">
+  <div class="header">
+    
+  </div>
+  <div class="sending-wrap">
+    <div class="spinner"></div>
+    <div>Сохраняем ваши ответы…</div>
   </div>
 </div>
 
-<!-- ADMIN -->
-<div id="page-admin" class="page">
-  <header class="adm-header">
-    <h2>Результаты тестирования</h2>
-    <button class="btn btn-ghost btn-sm" onclick="loadAdmin()">↻ Обновить</button>
-    <button class="btn btn-ghost btn-sm" onclick="exportCSV()">⬇ CSV</button>
-    <button class="btn btn-ghost btn-sm" onclick="showPage('page-welcome')">← Выйти</button>
-  </header>
-  <div class="adm-body">
-    <div id="adm-stats"></div>
-    <div id="adm-table"></div>
+<!-- ════════════ DONE ════════════ -->
+<div id="pg-done" class="page">
+  <div class="header">
+    
+    <div class="header-badge">Ваш результат</div>
+  </div>
+  <div class="done-wrap">
+    <div id="personal-result"></div>
+    <div class="result-note">
+      Результаты переданы организатору тренинга. Они рассматриваются конфиденциально и не разглашаются коллегам. Если хотите пройти повторно — обновите страницу.
+    </div>
+    <button onclick="location.reload()" style="background:none;border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 20px;font-family:'Inter',sans-serif;font-size:13px;color:var(--gray);cursor:pointer;font-weight:500">Пройти заново</button>
+  </div>
+</div>
+
+<!-- ════════════ ADMIN LOGIN ════════════ -->
+<div id="pg-admin-login" class="page">
+  <div class="header">
+    
+  </div>
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-title">Панель результатов</div>
+      <div class="field">
+        <label>Пароль</label>
+        <input type="password" id="admin-pw" placeholder="••••••••" onkeydown="if(event.key==='Enter')adminLogin()">
+      </div>
+      <div class="warn-box" id="login-err">Неверный пароль</div>
+      <button class="btn-start" onclick="adminLogin()">Войти</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════ ADMIN DASHBOARD ════════════ -->
+<div id="pg-admin" class="page">
+  <div class="header">
+    
+    <span style="font-size:13px;color:var(--gray);cursor:pointer;font-weight:500" onclick="adminLogout()">Выйти</span>
+  </div>
+  <div class="admin-container">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem">
+      <div class="page-title" style="margin-bottom:0">Результаты тестирования</div>
+      <button onclick="exportCSV()" style="padding:9px 16px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--white);font-family:'Inter',sans-serif;font-size:13px;font-weight:500;cursor:pointer;color:var(--black)">⬇ Скачать CSV</button>
+    </div>
+    <div class="stat-grid" id="admin-stats"></div>
+    <div class="filter-bar">
+      <select id="filter-risk" onchange="renderList()">
+        <option value="">Все уровни</option>
+        <option value="low">Низкий</option>
+        <option value="moderate">Умеренный</option>
+        <option value="high">Высокий</option>
+        <option value="critical">Критический</option>
+      </select>
+      <button onclick="loadAdminData()">↻ Обновить</button>
+    </div>
+    <div id="respondents-list"></div>
+  </div>
+</div>
+
+<!-- ════════════ DETAIL ════════════ -->
+<div id="pg-detail" class="page">
+  <div class="header">
+    
+  </div>
+  <div class="admin-container">
+    <span class="back-link" onclick="showPage('pg-admin')">← Назад к списку</span>
+    <div id="detail-content"></div>
   </div>
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby37u7Ith0EM58aZnxQh_3nnSJSa57dyP2xzaJfElqynm85-ttpSJooFhwXDo9f6o1hjQ/exec";
-const ADMIN_PASS = "admin2024";
-const LOCAL_KEY  = "bat_v1";
+// ══════════════════════════════════════════
+//  НАСТРОЙКА
+// ══════════════════════════════════════════
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzgmrinrrGmhiwHmxTbJHOVPS-HbAehI5NsF_eKpYlBVXki8BwPLQpqCVG4jx1LVf1IiA/exec";
+const ADMIN_PASSWORD = "nastya2024";
 
-const SCALES = [
-  { id:"exhaustion",  name:"Истощение",              desc:"Ощущение хронической усталости и опустошённости от работы",
-    questions:["На работе я чувствую себя эмоционально истощённым(ой)","Рабочий день кажется мне бесконечным","После работы мне трудно восстановить силы","Физически я чувствую усталость от своей работы","Мысли о работе мешают мне отдыхать"] },
-  { id:"distance",    name:"Дистанцирование",         desc:"Нарастающая психологическая отстранённость от работы и её смысла",
-    questions:["Мне стало труднее находить смысл в своей работе","Я сомневаюсь в значимости своей работы","Мне трудно проявлять энтузиазм по отношению к работе","Мне всё равно, что происходит с коллегами","Я хочу дистанцироваться от работы и людей на работе"] },
-  { id:"impairment",  name:"Когнитивные нарушения",   desc:"Снижение концентрации, внимания и способности решать задачи",
-    questions:["На работе мне трудно сосредоточиться","Я делаю ошибки из-за того, что не могу сконцентрироваться","Мне сложно обдумывать сложные задачи","Я медленнее соображаю, чем обычно"] },
-  { id:"emotional",   name:"Эмоциональные нарушения", desc:"Потеря контроля над эмоциями, раздражительность, тревога",
-    questions:["На работе я остро реагирую даже на незначительные события","Я чувствую страх, что не справлюсь с работой","Когда я думаю о работе, мне становится тревожно","Я остро реагирую на критику коллег или руководства"] },
-  { id:"physical",    name:"Физические жалобы",       desc:"Соматические симптомы, связанные с рабочим стрессом",
-    questions:["На работе я страдаю от физических недомоганий (головные боли, боли в шее, мышцах и т.п.)","Из-за работы у меня возникают проблемы со сном","Я замечаю, что работа негативно сказывается на моём здоровье","Уровень моего физического здоровья снизился из-за работы"] }
+// ══════════════════════════════════════════
+const QUESTIONS = [
+  // Истощение (BAT уникальные + MBI уникальные)
+  {id:"e1",dim:"exhaustion",text:"После рабочего дня мне не хватает сил на личные дела"},
+  {id:"e2",dim:"exhaustion",text:"Я чувствую усталость, когда встаю утром и думаю о предстоящем рабочем дне"},
+  {id:"e4",dim:"exhaustion",text:"Я чувствую себя измотанным до предела"},
+  {id:"e5",dim:"exhaustion",text:"Я чувствую, что работаю на износ"},
+  // Дистанцирование / Деперсонализация
+  {id:"d1",dim:"distance",text:"Я стал(а) более равнодушным к людям с тех пор, как занимаюсь этой работой"},
+  {id:"d2",dim:"distance",text:"Я чувствую, что слишком дистанцировался от своей работы"},
+  {id:"d3",dim:"distance",text:"Мне кажется, некоторые коллеги или клиенты считают меня виновным в своих проблемах"},
+  {id:"d4",dim:"distance",text:"Я стал относиться к некоторым людям так, словно они — безликие объекты"},
+  // Когнитивное нарушение
+  {id:"c1",dim:"cognitive",text:"Мне трудно сосредоточиться на работе"},
+  {id:"c2",dim:"cognitive",text:"Я делаю глупые ошибки из-за усталости"},
+  {id:"c3",dim:"cognitive",text:"Мне трудно думать ясно на работе"},
+  {id:"c4",dim:"cognitive",text:"Я забываю важные рабочие вещи"},
+  // Эмоциональное нарушение
+  {id:"e6",dim:"emotional",text:"Я чувствую себя подавленным от эмоциональных требований работы"},
+  {id:"e7",dim:"emotional",text:"Мне кажется, что я отдаю больше, чем получаю в работе"},
+  {id:"e8",dim:"emotional",text:"Я с трудом управляю своими эмоциями на работе"},
+  // Личные достижения (обратная шкала MBI)
+  {id:"a1",dim:"achievement",text:"Я легко понимаю, что чувствуют мои коллеги"},
+  {id:"a2",dim:"achievement",text:"Я эффективно решаю проблемы, которые возникают в работе"},
+  {id:"a3",dim:"achievement",text:"Я чувствую, что положительно влияю на людей через свою работу"},
+  {id:"a4",dim:"achievement",text:"За время работы я достиг многого стоящего"},
+  // Ментальное отстранение
+  {id:"m1",dim:"mental",text:"Я постоянно испытываю напряжение из-за работы"},
+  {id:"m2",dim:"mental",text:"Я думаю о работе, когда пытаюсь расслабиться"},
+  {id:"m3",dim:"mental",text:"Мне трудно отключиться от мыслей о работе"},
+  // Вторичные симптомы
+  {id:"s1",dim:"secondary",text:"Из-за работы я плохо сплю"},
+  {id:"s2",dim:"secondary",text:"Работа вызывает физические симптомы стресса (головная боль, напряжение в теле)"},
+  {id:"s3",dim:"secondary",text:"Меня расстраивает мысль о том, что нужно идти на работу"},
+  {id:"s4",dim:"secondary",text:"Я чувствую себя беспомощным в своей работе"},
 ];
-const OPTS = [{l:"Никогда",v:1},{l:"Редко",v:2},{l:"Иногда",v:3},{l:"Часто",v:4},{l:"Всегда",v:5}];
-const TOTAL_Q = SCALES.reduce((s,sc)=>s+sc.questions.length,0);
 
-let answers = {}, currentName = "";
+const DIMS = {
+  exhaustion:  {label:"Истощение",              q:["e1","e2","e4","e5"],         color:"#2B5CE6"},
+  distance:    {label:"Дистанцирование",         q:["d1","d2","d3","d4"],              color:"#7C3AED"},
+  cognitive:   {label:"Когнитивное нарушение",   q:["c1","c2","c3","c4"],              color:"#0891B2"},
+  emotional:   {label:"Эмоциональное нарушение", q:["e6","e7","e8"],                   color:"#DB2777"},
+  achievement: {label:"Личные достижения",        q:["a1","a2","a3","a4"],              color:"#16A34A", reverse:true},
+  mental:      {label:"Ментальное отстранение",   q:["m1","m2","m3"],                   color:"#059669"},
+  secondary:   {label:"Вторичные симптомы",       q:["s1","s2","s3","s4"],              color:"#D97706"},
+};
+
+const SECTIONS = [
+  {dim:"exhaustion",  label:"Истощение"},
+  {dim:"distance",    label:"Дистанцирование"},
+  {dim:"cognitive",   label:"Когнитивное нарушение"},
+  {dim:"emotional",   label:"Эмоциональное нарушение"},
+  {dim:"achievement", label:"Личные достижения"},
+  {dim:"mental",      label:"Ментальное отстранение"},
+  {dim:"secondary",   label:"Вторичные симптомы"},
+];
+
+const RISK = {
+  low:     {label:"Низкий",    bg:"#DCFCE7",border:"#86EFAC",text:"#15803D"},
+  moderate:{label:"Умеренный", bg:"#FEF9C3",border:"#FDE047",text:"#854D0E"},
+  high:    {label:"Высокий",   bg:"#FFF7ED",border:"#FDBA74",text:"#C2410C"},
+  critical:{label:"Критический",bg:"#FEE2E2",border:"#FCA5A5",text:"#B91C1C"},
+};
+
+let answers = {};
+let respondentName = "";
+let respondentDept = "";
+let adminAuthed = false;
+let allData = [];
+let filteredData = [];
+
+function riskLevel(s) {
+  if (s < 2.4) return "low";
+  if (s < 3.4) return "moderate";
+  if (s < 4.2) return "high";
+  return "critical";
+}
+
+function calcScores(ans) {
+  const s = {};
+  for (const [dim, info] of Object.entries(DIMS)) {
+    const vals = info.q.map(id => ans[id] || 0).filter(v => v > 0);
+    s[dim] = vals.length ? Math.round((vals.reduce((a,b)=>a+b,0)/vals.length)*10)/10 : 0;
+  }
+  // achievement is reverse-scored: high score = low burnout, so invert for total
+  if (s.achievement) s.achievement_inv = Math.round((6 - s.achievement)*10)/10;
+  const pv = ["exhaustion","distance","cognitive","emotional","mental"].map(d=>s[d]).filter(v=>v>0);
+  s.total = pv.length ? Math.round((pv.reduce((a,b)=>a+b,0)/pv.length)*10)/10 : 0;
+  return s;
+}
 
 function showPage(id) {
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
-  window.scrollTo(0,0);
+  window.scrollTo(0, 0);
 }
 
-function resetForm() {
-  document.getElementById('resp-name').value = '';
-  showPage('page-welcome');
-}
-
-function startQuiz() {
-  const n = document.getElementById('resp-name').value.trim();
-  if (!n) { document.getElementById('name-err').style.display='block'; return; }
-  document.getElementById('name-err').style.display='none';
-  currentName=n; answers={};
-  buildQuiz();
-  showPage('page-quiz');
-}
-
-function buildQuiz() {
-  const body = document.getElementById('quiz-body');
-  body.innerHTML='';
-  let g=0;
-  SCALES.forEach((sc,si)=>{
-    const sec=document.createElement('div');
-    sec.className='scale-section';
-    sec.innerHTML=`<div class="scale-title">${sc.name}</div><div class="scale-desc">${sc.desc}</div>`;
-    sc.questions.forEach((q,qi)=>{
-      g++;
-      const key=`${si}_${qi}`;
-      const card=document.createElement('div');
-      card.className='q-card'; card.id=`qc_${key}`;
-      card.innerHTML=`<div class="q-num">Вопрос ${g}</div>
-        <div class="q-text">${q}</div>
-        <div class="opts">${OPTS.map(o=>`<button class="opt" data-key="${key}" data-val="${o.v}" onclick="pick('${key}',${o.v},this)"><span class="opt-num">${o.v}</span><span class="opt-lbl">${o.l}</span></button>`).join('')}</div>`;
-      sec.appendChild(card);
-    });
-    body.appendChild(sec);
-  });
-}
-
-function pick(key,val,btn){
-  answers[key]=val;
-  document.querySelectorAll(`.opt[data-key="${key}"]`).forEach(b=>b.classList.toggle('sel',b===btn));
-  const card=document.getElementById(`qc_${key}`);
-  if(card) card.classList.add('answered');
-  const n=Object.keys(answers).length;
-  document.getElementById('prog-fill').style.width=(n/TOTAL_Q*100)+'%';
-  document.getElementById('prog-label').textContent=`${n} / ${TOTAL_Q}`;
-}
-
-function submitQuiz(){
-  const missing=[];
-  SCALES.forEach((sc,si)=>sc.questions.forEach((_,qi)=>{ if(!answers[`${si}_${qi}`]) missing.push(`${si}_${qi}`); }));
-  if(missing.length){
-    document.getElementById('quiz-err').textContent=`Ответьте на все вопросы (осталось ${missing.length}).`;
-    document.getElementById(`qc_${missing[0]}`).scrollIntoView({behavior:'smooth',block:'center'});
+// ─── Survey ───
+function startSurvey() {
+  const nameInput = document.getElementById('resp-name');
+  const nameVal = nameInput.value.trim();
+  if (!nameVal) {
+    nameInput.style.borderColor = '#DC2626';
+    nameInput.style.boxShadow = '0 0 0 3px rgba(220,38,38,.1)';
+    nameInput.placeholder = 'Пожалуйста, введите ваше имя';
+    nameInput.focus();
+    setTimeout(() => {
+      nameInput.style.borderColor = '';
+      nameInput.style.boxShadow = '';
+      nameInput.placeholder = 'Иванов Иван Иванович';
+    }, 2500);
     return;
   }
-  document.getElementById('quiz-err').textContent='';
-  const r=calcResult();
-  saveResult(r);
-  renderResult(r);
-  showPage('page-result');
+  respondentName = nameVal;
+  const deptInput = document.getElementById('resp-dept');
+  const deptVal = deptInput.value.trim();
+  if (!deptVal) {
+    deptInput.style.borderColor = '#DC2626';
+    deptInput.style.boxShadow = '0 0 0 3px rgba(220,38,38,.1)';
+    deptInput.placeholder = 'Пожалуйста, укажите отдел';
+    deptInput.focus();
+    setTimeout(() => {
+      deptInput.style.borderColor = '';
+      deptInput.style.boxShadow = '';
+      deptInput.placeholder = 'Поддержка, Сделки…';
+    }, 2500);
+    return;
+  }
+  respondentDept = deptVal;
+  answers = {};
+  buildQuestions();
+  showPage('pg-survey');
+  document.getElementById('survey-user-name').textContent = respondentName + ' · ' + respondentDept;
 }
 
-function calcResult(){
-  const scaleScores=SCALES.map((sc,si)=>{
-    const vals=sc.questions.map((_,qi)=>answers[`${si}_${qi}`]);
-    const avg=Math.round(vals.reduce((s,v)=>s+v,0)/vals.length*10)/10;
-    return{id:sc.id,name:sc.name,avg};
+function buildQuestions() {
+  const container = document.getElementById('questions-container');
+  container.innerHTML = '';
+  let qNum = 0;
+  SECTIONS.forEach(sec => {
+    const dim = DIMS[sec.dim];
+    const qs = QUESTIONS.filter(q => q.dim === sec.dim);
+    const block = document.createElement('div');
+    block.className = 'section-block';
+    block.innerHTML = `<div class="section-head">
+      <div class="section-dot" style="background:${dim.color}"></div>
+      <div class="section-name">${sec.label}</div>
+      <div class="section-count">${qs.length} вопр.</div>
+    </div>`;
+    qs.forEach(q => {
+      qNum++;
+      const row = document.createElement('div');
+      row.className = 'q-row';
+      row.id = 'qrow-' + q.id;
+      let btns = '';
+      for (let v = 1; v <= 5; v++) {
+        btns += `<button class="sb" id="sb-${q.id}-${v}" onclick="selectAnswer('${q.id}',${v})">${v}</button>`;
+      }
+      row.innerHTML = `<div class="q-num-text">
+        <span class="q-num">${qNum}</span>
+        <span class="q-text">${q.text}</span>
+      </div>
+      <div class="scale-btns">${btns}</div>`;
+      block.appendChild(row);
+    });
+    container.appendChild(block);
   });
-  const overall=Math.round(scaleScores.reduce((s,sc)=>s+sc.avg,0)/scaleScores.length*10)/10;
-  return{name:currentName,date:new Date().toISOString(),scaleScores,overall};
+  updateProgress();
 }
 
-function getLevel(score){
-  if(score<=2.5) return{label:"Низкий",cls:"low"};
-  if(score<=3.5) return{label:"Средний",cls:"medium"};
-  return{label:"Высокий",cls:"high"};
+function selectAnswer(qId, val) {
+  answers[qId] = val;
+  for (let v = 1; v <= 5; v++) {
+    const b = document.getElementById(`sb-${qId}-${v}`);
+    if (b) b.classList.toggle('sel', v === val);
+  }
+  const row = document.getElementById('qrow-' + qId);
+  if (row) { row.classList.add('answered'); row.classList.remove('unanswered-err'); }
+  updateProgress();
 }
 
-function renderResult(r){
-  document.getElementById('res-name-line').textContent=`${r.name} — спасибо за прохождение теста. Ниже — ваши показатели по пяти шкалам.`;
-  const lv=getLevel(r.overall);
-  document.getElementById('res-badge').innerHTML=`<div class="overall-badge ${lv.cls}">Общий уровень выгорания: <strong>${lv.label}</strong> (${r.overall} / 5)</div>`;
-  document.getElementById('res-scales').innerHTML=r.scaleScores.map(sc=>{
-    const slv=getLevel(sc.avg);
-    const pct=Math.round((sc.avg-1)/4*100);
-    return`<div class="sbar"><div class="sbar-head"><span class="sbar-name">${sc.name}</span><span class="sbar-score">${sc.avg} / 5</span></div><div class="bar-track"><div class="bar-fill ${slv.cls}" style="width:${pct}%"></div></div><div class="sbar-lv">${slv.label} уровень</div></div>`;
+function updateProgress() {
+  const count = Object.keys(answers).length;
+  document.getElementById('answered-count').textContent = count;
+  document.getElementById('survey-progress-text').textContent = `${count} / ${QUESTIONS.length}`;
+}
+
+async function submitSurvey() {
+  const unanswered = QUESTIONS.filter(q => !answers[q.id]);
+  if (unanswered.length > 0) {
+    unanswered.forEach(q => {
+      const row = document.getElementById('qrow-' + q.id);
+      if (row) { row.classList.add('unanswered-err'); row.scrollIntoView({behavior:'smooth', block:'center'}); }
+    });
+    const err = document.getElementById('err-msg');
+    err.style.display = 'block';
+    setTimeout(() => err.style.display = 'none', 4000);
+    return;
+  }
+  showPage('pg-sending');
+  const scores = calcScores(answers);
+  const risk = riskLevel(scores.total);
+  const payload = {
+    action: "submit",
+    ts: new Date().toISOString(),
+    name: respondentName,
+    dept: respondentDept,
+    risk,
+    scores_json: JSON.stringify(scores),
+    answers_json: JSON.stringify(answers)
+  };
+  try {
+    await fetch(SCRIPT_URL, {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify(payload)
+    });
+  } catch(e) { console.warn("Fetch error:", e); }
+  renderPersonalResult(scores, risk);
+  showPage('pg-done');
+}
+
+function renderPersonalResult(scores, risk) {
+  const r = RISK[risk];
+  let bars = Object.entries(DIMS).map(([dim, info]) => {
+    const pct = Math.round((scores[dim]/5)*100);
+    return `<div class="dim-row2">
+      <div class="dim-header"><span class="dim-lbl">${info.label}</span><span class="dim-val">${scores[dim].toFixed(1)}</span></div>
+      <div class="dim-track"><div class="dim-fill" style="width:${pct}%;background:${info.color}"></div></div>
+    </div>`;
+  }).join('');
+  document.getElementById('personal-result').innerHTML = `
+    <div class="result-hero">
+      <div class="result-name">Результат для: <strong>${respondentName}</strong></div>
+      <div class="result-badge" style="background:${r.bg};border-color:${r.border};color:${r.text}">${r.label} уровень выгорания</div>
+      <div class="result-score" style="color:${r.text}">${scores.total.toFixed(1)}</div>
+      <div class="result-level" style="color:${r.text}">${r.label}</div>
+      <div class="result-of5">из 5.0 баллов</div>
+    </div>
+    <div class="dim-card">
+      <div class="dim-card-title">Результаты по шкалам</div>
+  <div style="font-size:11px;color:var(--gray);margin-bottom:.75rem">* Шкала «Личные достижения» — обратная: высокий балл означает низкое выгорание</div>
+      ${bars}
+    </div>
+  `;
+}
+
+// ─── Admin ───
+function adminLogin() {
+  if (document.getElementById('admin-pw').value === ADMIN_PASSWORD) {
+    adminAuthed = true;
+    document.getElementById('admin-pw').value = '';
+    document.getElementById('login-err').style.display = 'none';
+    loadAdminData();
+  } else {
+    document.getElementById('login-err').style.display = 'block';
+  }
+}
+
+function adminLogout() { adminAuthed = false; showPage('pg-admin-login'); }
+
+async function loadAdminData() {
+  showPage('pg-admin');
+  document.getElementById('respondents-list').innerHTML = '<div class="empty"><div class="spinner" style="margin:0 auto 1rem"></div>Загружаем данные…</div>';
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=getAll`);
+    allData = await res.json();
+    renderAdminStats();
+    renderList();
+  } catch(e) {
+    document.getElementById('respondents-list').innerHTML = '<div class="empty">Ошибка загрузки. Проверьте URL скрипта.</div>';
+  }
+}
+
+function renderAdminStats() {
+  const rc = {low:0,moderate:0,high:0,critical:0};
+  allData.forEach(r => rc[r.risk] = (rc[r.risk]||0)+1);
+  const avg = allData.length ? Math.round(allData.reduce((a,r)=>a+(parseFloat(r.total)||0),0)/allData.length*10)/10 : 0;
+  document.getElementById('admin-stats').innerHTML = `
+    <div class="stat-card"><div class="stat-num">${allData.length}</div><div class="stat-lbl">прошли тест</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--blue)">${avg}</div><div class="stat-lbl">средний балл</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:var(--red)">${(rc.high||0)+(rc.critical||0)}</div><div class="stat-lbl">высокий риск</div></div>
+  `;
+}
+
+function renderList() {
+  const riskF = document.getElementById('filter-risk').value;
+  filteredData = allData.filter(r => riskF ? r.risk === riskF : true)
+    .sort((a,b) => parseFloat(b.total||0)-parseFloat(a.total||0));
+  const el = document.getElementById('respondents-list');
+  if (!filteredData.length) { el.innerHTML = '<div class="empty">Нет данных</div>'; return; }
+  el.innerHTML = filteredData.map((r,i) => {
+    const ri = RISK[r.risk]||RISK.low;
+    const date = r.ts ? new Date(r.ts).toLocaleDateString('ru-RU',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '—';
+    let sc = {}; try { sc = JSON.parse(r.scores_json||'{}'); } catch{}
+    let bars = Object.entries(DIMS).map(([dim,info]) => {
+      const val = sc[dim]||0; const pct = Math.round((val/5)*100);
+      return `<div class="mbar-row"><span class="mbar-lbl">${info.label}</span><div class="mbar-track"><div class="mbar-fill" style="width:${pct}%;background:${info.color}"></div></div><span class="mbar-val">${val.toFixed(1)}</span></div>`;
+    }).join('');
+    return `<div class="r-card2" onclick="showDetail(${i})">
+      <div class="rc-top"><span class="rc-name">${r.name}</span><span class="rc-date">${date}</span></div>
+      <div class="rc-sub"><span class="badge2" style="background:${ri.bg};border-color:${ri.border};color:${ri.text}">${ri.label}</span><span style="font-size:12px;color:var(--gray)">${parseFloat(r.total||0).toFixed(1)}/5.0</span></div>
+      <div class="mini-bars">${bars}</div>
+    </div>`;
   }).join('');
 }
 
-function saveResult(r){
-  const payload={
-    name:r.name, date:r.date,
-    exhaustion: r.scaleScores.find(s=>s.id==='exhaustion')?.avg,
-    distance:   r.scaleScores.find(s=>s.id==='distance')?.avg,
-    impairment: r.scaleScores.find(s=>s.id==='impairment')?.avg,
-    emotional:  r.scaleScores.find(s=>s.id==='emotional')?.avg,
-    physical:   r.scaleScores.find(s=>s.id==='physical')?.avg,
-    overall:    r.overall,
-    level:      getLevel(r.overall).label
-  };
-  // Google Sheets (fire-and-forget)
-  fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)})
-    .catch(e=>console.warn('Sheets error:',e));
-}
-
-/* ADMIN */
-function checkAdminPass(){
-  if(document.getElementById('adm-pass').value===ADMIN_PASS){
-    document.getElementById('adm-err').style.display='none';
-    document.getElementById('adm-pass').value='';
-    loadAdmin();
-    showPage('page-admin');
-  } else {
-    document.getElementById('adm-err').style.display='block';
-  }
-}
-
-function loadAdmin(){
-  document.getElementById('adm-stats').innerHTML='';
-  document.getElementById('adm-table').innerHTML=`
-    <div class="info-box">
-      📊 Все результаты хранятся в вашей <strong>Google Таблице «BAT Results»</strong>.<br>
-      Данные поступают туда в реальном времени с любого устройства сотрудников.<br>
-      <a href="https://docs.google.com/spreadsheets/" target="_blank">Открыть Google Sheets →</a>
+function showDetail(idx) {
+  const r = filteredData[idx]; if (!r) return;
+  const ri = RISK[r.risk]||RISK.low;
+  const date = r.ts ? new Date(r.ts).toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
+  let sc = {}, ans = {}; try { sc = JSON.parse(r.scores_json||'{}'); } catch{} try { ans = JSON.parse(r.answers_json||'{}'); } catch{}
+  let bars = Object.entries(DIMS).map(([dim,info]) => {
+    const val = sc[dim]||0; const pct = Math.round((val/5)*100);
+    return `<div class="dim-row2"><div class="dim-header"><span class="dim-lbl">${info.label}</span><span class="dim-val">${val.toFixed(1)}</span></div><div class="dim-track"><div class="dim-fill" style="width:${pct}%;background:${info.color}"></div></div></div>`;
+  }).join('');
+  const labels = ["—","Никогда","Редко","Иногда","Часто","Всегда"];
+  const dimNames = {exhaustion:"Истощение",distance:"Дистанцирование",cognitive:"Когн.",emotional:"Эмоц.",achievement:"Достижения",mental:"Ментальное",secondary:"Вторичные"};
+  let rows = QUESTIONS.map(q => `<tr><td style="color:var(--gray);font-size:11px">${dimNames[q.dim]}</td><td>${q.text}</td><td style="text-align:center;font-weight:600">${ans[q.id]||'—'}<div style="font-size:10px;color:var(--gray);font-weight:400">${labels[ans[q.id]]||''}</div></td></tr>`).join('');
+  document.getElementById('detail-content').innerHTML = `
+    <div style="font-size:20px;font-weight:700;margin-bottom:.25rem">${r.name}</div>
+    <div style="font-size:13px;color:var(--gray);margin-bottom:1.25rem">${date}</div>
+    <div class="result-hero" style="text-align:center;margin-bottom:1rem">
+      <div class="result-badge" style="background:${ri.bg};border-color:${ri.border};color:${ri.text}">${ri.label}</div>
+      <div class="result-score" style="color:${ri.text}">${parseFloat(r.total||0).toFixed(1)}</div>
+      <div class="result-of5">из 5.0 баллов</div>
     </div>
-    <div class="empty-state">
-      Для просмотра всех ответов откройте Google Таблицу.<br>
-      Там можно фильтровать, сортировать и скачивать данные в любом формате.
-    </div>`;
-  document.getElementById('adm-stats').innerHTML=`
-    <div class="stat-card" style="grid-column:1/-1;background:rgba(232,168,124,.05);border-color:rgba(232,168,124,.2)">
-      <div style="font-size:.82rem;color:var(--muted);line-height:1.7">
-        ✅ Бэкенд подключён к Google Sheets<br>
-        🔗 URL скрипта активен и принимает данные<br>
-        📋 Таблица: <strong>BAT Results</strong> — смотри в Google Drive
-      </div>
-    </div>`;
+    <div class="dim-card" style="margin-bottom:1rem">${bars}</div>
+    <div class="dim-card">
+      <div class="dim-card-title">Детальные ответы</div>
+      <div style="overflow-x:auto"><table class="resp-table"><thead><tr><th>Шкала</th><th>Утверждение</th><th>Ответ</th></tr></thead><tbody>${rows}</tbody></table></div>
+    </div>
+  `;
+  showPage('pg-detail');
 }
 
-function exportCSV(){
-  alert('Скачайте данные напрямую из Google Sheets: Файл → Скачать → CSV');
+function exportCSV() {
+  if (!allData.length) { alert('Нет данных'); return; }
+  const dimKeys = Object.keys(DIMS);
+  const header = ['Дата','Имя','Риск','Общий балл',...dimKeys.map(d=>DIMS[d].label)].join(',');
+  const rows = allData.map(r => {
+    let s={}; try{s=JSON.parse(r.scores_json||'{}');}catch{}
+    return [r.ts,`"${r.name}"`,r.risk,r.total,...dimKeys.map(d=>s[d]||0)].join(',');
+  });
+  const blob = new Blob(['\ufeff'+[header,...rows].join('\n')],{type:'text/csv;charset=utf-8;'});
+  const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='bat_playerok.csv'; a.click();
 }
 
-function esc(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+if (location.hash === '#admin') showPage('pg-admin-login');
 </script>
 </body>
 </html>
