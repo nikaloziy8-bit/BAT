@@ -371,7 +371,7 @@ h1.intro-h1 .blue{ color:var(--blue); }
 .admin-header-row { display:flex; justify-content:space-between; align-items:center; margin-bottom:1.5rem; flex-wrap:wrap; gap:1rem; }
 .page-title { font-size:22px; font-weight:800; letter-spacing:-.5px; }
 
-.stat-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:1.75rem; }
+.stat-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:12px; margin-bottom:1.75rem; }
 .stat-card {
   background:#fff; border:1px solid var(--border);
   border-radius:16px; padding:1.25rem 1.5rem;
@@ -483,7 +483,7 @@ h1.intro-h1 .blue{ color:var(--blue); }
 .empty { text-align:center; padding:4rem 1rem; color:var(--gray); font-size:14px; }
 
 @media(max-width:640px) {
-  .stat-grid { grid-template-columns:repeat(2,1fr); }
+  .stat-grid { grid-template-columns:repeat(3,1fr); }
   .mbar-lbl { width:110px; }
 }
 
@@ -763,13 +763,82 @@ h1.intro-h1 .blue{ color:var(--blue); }
   #detail-content > div:first-child { flex-direction:column; }
   #detail-content > div:nth-child(2) { grid-template-columns:1fr; }
 }
+
+/* ── FLOATING BG ELEMENTS ── */
+.float-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+.fb {
+  position: absolute;
+  font-size: 28px;
+  opacity: .18;
+  user-select: none;
+}
+.fb-logo {
+  background: #2B5CE6;
+  color: #fff;
+  font-family: 'Inter', sans-serif;
+  font-weight: 800;
+  font-size: 16px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  letter-spacing: -1px;
+}
+
+/* Positions */
+.fb1 { top: 8%;  left: 6%;  }
+.fb2 { top: 15%; left: 22%; font-size: 32px; }
+.fb3 { top: 5%;  left: 55%; font-size: 24px; }
+.fb4 { top: 45%; left: 80%; }
+.fb5 { top: 70%; left: 12%; font-size: 26px; }
+.fb6 { top: 80%; left: 65%; font-size: 30px; }
+.fb7 { top: 55%; left: 40%; font-size: 20px; }
+.fb8 { top: 30%; left: 90%; font-size: 28px; }
+
+/* Individual float animations */
+@keyframes float1 { 0%,100%{transform:translateY(0) rotate(-6deg)} 50%{transform:translateY(-18px) rotate(4deg)} }
+@keyframes float2 { 0%,100%{transform:translateY(0) rotate(3deg)} 50%{transform:translateY(-22px) rotate(-5deg)} }
+@keyframes float3 { 0%,100%{transform:translateY(0) rotate(8deg)} 50%{transform:translateY(-14px) rotate(-3deg)} }
+@keyframes float4 { 0%,100%{transform:translateY(0) rotate(-4deg)} 50%{transform:translateY(-20px) rotate(7deg)} }
+@keyframes float5 { 0%,100%{transform:translateY(0) rotate(5deg)} 50%{transform:translateY(-16px) rotate(-8deg)} }
+@keyframes float6 { 0%,100%{transform:translateY(0) rotate(-7deg)} 50%{transform:translateY(-24px) rotate(4deg)} }
+@keyframes float7 { 0%,100%{transform:translateY(0) rotate(2deg)} 50%{transform:translateY(-12px) rotate(-6deg)} }
+@keyframes float8 { 0%,100%{transform:translateY(0) rotate(-5deg)} 50%{transform:translateY(-20px) rotate(3deg)} }
+
+.fb1 { animation: float1 6.5s ease-in-out infinite; }
+.fb2 { animation: float2 7.2s ease-in-out infinite; animation-delay: -.8s; }
+.fb3 { animation: float3 5.8s ease-in-out infinite; animation-delay: -2.1s; }
+.fb4 { animation: float4 8.0s ease-in-out infinite; animation-delay: -1.5s; }
+.fb5 { animation: float5 6.8s ease-in-out infinite; animation-delay: -3.2s; }
+.fb6 { animation: float6 7.5s ease-in-out infinite; animation-delay: -.5s; }
+.fb7 { animation: float7 5.5s ease-in-out infinite; animation-delay: -4.0s; }
+.fb8 { animation: float8 6.2s ease-in-out infinite; animation-delay: -1.8s; }
+
+/* Make sure card is above floats */
+.intro-card { position: relative; z-index: 1; }
 </style>
 </head>
 <body>
 
 <!-- ══ INTRO ══ -->
 <div id="pg-intro" class="page active">
-  <div id="intro-fullpage"><div class="intro-card">
+  <div id="intro-fullpage">
+  <!-- Floating background elements -->
+  <div class="float-bg">
+    <div class="fb fb1"><div class="fb-logo">Pl</div></div>
+    <div class="fb fb2">🧠</div>
+    <div class="fb fb3">🤓</div>
+    <div class="fb fb4"><div class="fb-logo">Pl</div></div>
+    <div class="fb fb5">🧠</div>
+    <div class="fb fb6">🤓</div>
+    <div class="fb fb7"><div class="fb-logo">Pl</div></div>
+    <div class="fb fb8">🧠</div>
+  </div>
+  <div class="intro-card">
     <div class="intro-left">
       <div class="intro-left-inner">
         <div class="intro-tag"><span class="tag-dot"></span>Playerok · Оценка состояния</div>
@@ -1288,6 +1357,7 @@ function renderAdminStats() {
   document.getElementById('admin-stats').innerHTML = `
     <div class="stat-card"><div class="stat-num">${allData.length}</div><div class="stat-lbl">Прошли тест</div></div>
     <div class="stat-card"><div class="stat-num" style="color:var(--blue)">${avg}</div><div class="stat-lbl">Средний балл</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:#15803D">${rc['Слабое']||0}</div><div class="stat-lbl">Слабое выгорание</div></div>
     <div class="stat-card"><div class="stat-num" style="color:#F59E0B">${rc['Среднее']||0}</div><div class="stat-lbl">Среднее выгорание</div></div>
     <div class="stat-card"><div class="stat-num" style="color:#E85D4A">${rc['Сильное']||0}</div><div class="stat-lbl">Сильное истощение</div></div>
   `;
