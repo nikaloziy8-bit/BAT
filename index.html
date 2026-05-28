@@ -733,6 +733,36 @@ h1.intro-h1 .blue{ color:var(--blue); }
   background: var(--blue-light);
   transform: translateY(-1px);
 }
+
+/* ── DETAIL PAGE ── */
+.detail-dim-card {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 2px 8px rgba(0,0,30,.04);
+}
+.ddc-top {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin-bottom: .75rem;
+}
+.ddc-icon { font-size: 20px; flex-shrink: 0; }
+.ddc-info { flex: 1; }
+.ddc-name { font-size: 13px; font-weight: 700; color: var(--black); margin-bottom: 2px; }
+.ddc-tip  { font-size: 11px; color: var(--gray); line-height: 1.45; }
+.ddc-score {
+  font-size: 18px; font-weight: 800;
+  color: var(--black); flex-shrink: 0;
+  letter-spacing: -1px;
+}
+.ddc-score span { font-size: 11px; color: var(--gray); font-weight: 400; }
+
+@media(max-width:560px) {
+  #detail-content > div:first-child { flex-direction:column; }
+  #detail-content > div:nth-child(2) { grid-template-columns:1fr; }
+}
 </style>
 </head>
 <body>
@@ -1258,8 +1288,8 @@ function renderAdminStats() {
   document.getElementById('admin-stats').innerHTML = `
     <div class="stat-card"><div class="stat-num">${allData.length}</div><div class="stat-lbl">Прошли тест</div></div>
     <div class="stat-card"><div class="stat-num" style="color:var(--blue)">${avg}</div><div class="stat-lbl">Средний балл</div></div>
+    <div class="stat-card"><div class="stat-num" style="color:#F59E0B">${rc['Среднее']||0}</div><div class="stat-lbl">Среднее выгорание</div></div>
     <div class="stat-card"><div class="stat-num" style="color:#E85D4A">${rc['Сильное']||0}</div><div class="stat-lbl">Сильное истощение</div></div>
-    <div class="stat-card"><div class="stat-num" style="color:#F59E0B">${high}</div><div class="stat-lbl">Среднее + Сильное</div></div>
   `;
   const sel = document.getElementById('filter-dept');
   const cur = sel.value;
@@ -1332,29 +1362,102 @@ function renderList() {
 }
 
 function showDetail(idx) {
-  const r = filteredData[idx]; if (!r) return;
-  const ri = RISK[r.risk]||RISK.low;
+  const r = filteredData[idx];
+  if (!r) return;
+
+  const RISK_COLORS = {
+    'Слабое':  {bg:'#DCFCE7',border:'#86EFAC',text:'#15803D'},
+    'Среднее': {bg:'#FEF9C3',border:'#FDE047',text:'#854D0E'},
+    'Сильное': {bg:'#FEE2E2',border:'#FCA5A5',text:'#B91C1C'},
+  };
+  const dimMax   = {exhaustion:45, distance:30, cognitive:25, resource:25};
+  const dimColors= {exhaustion:'#E85D4A', distance:'#7C3AED', cognitive:'#2B5CE6', resource:'#16A34A'};
+  const dimIcons = {exhaustion:'🔋', distance:'🌊', cognitive:'🧠', resource:'✨'};
+  const dimLabels= {exhaustion:'Истощение', distance:'Отстранённость', cognitive:'Когн. перегрузка', resource:'Ресурсность'};
+  const dimTips  = {
+    exhaustion:'Восстанавливайтесь активно: даже 10 минут без задач в середине дня снижают напряжение.',
+    distance:'Попробуйте найти хотя бы один момент, который приносит смысл или удовольствие.',
+    cognitive:'Разгрузите голову: записывайте задачи и позволяйте себе завершать день с незакрытым списком.',
+    resource:'Ваш ресурс помогает справляться. Замечайте, что его пополняет, и защищайте это время.'
+  };
+
+  const ri = RISK_COLORS[r.risk] || RISK_COLORS['Слабое'];
   const date = r.ts ? new Date(r.ts).toLocaleDateString('ru-RU',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '—';
-  let sc = {}, ans = {}; try { sc = JSON.parse(r.scores_json||'{}'); } catch{} try { ans = JSON.parse(r.answers_json||'{}'); } catch{}
-  let bars = Object.entries(DIMS).map(([dim,info]) => {
-    const val = sc[dim]||0; const pct = Math.round((val/5)*100);
-    return `<div class="dim-row2"><div class="dim-header"><span class="dim-lbl">${info.label}</span><span class="dim-val">${val.toFixed(1)}</span></div><div class="dim-track"><div class="dim-fill" style="width:${pct}%;background:${info.color}"></div></div></div>`;
+  let sc = {}, ans = {};
+  try { sc = JSON.parse(r.scores_json||'{}'); } catch{}
+  try { ans = JSON.parse(r.answers_json||'{}'); } catch{}
+
+  // Dim cards
+  const dimCards = Object.entries(dimMax).map(([dim, max]) => {
+    const val = sc[dim]||0;
+    const pct = Math.round((val/max)*100);
+    const col = dim==='resource' ? '#16A34A' : pct>=80?'#E85D4A':pct>=60?'#F59E0B':'#2B5CE6';
+    return `<div class="detail-dim-card">
+      <div class="ddc-top">
+        <span class="ddc-icon">${dimIcons[dim]}</span>
+        <div class="ddc-info">
+          <div class="ddc-name">${dimLabels[dim]}</div>
+          <div class="ddc-tip">${dimTips[dim]}</div>
+        </div>
+        <div class="ddc-score">${val}<span> / ${max}</span></div>
+      </div>
+      <div class="rdc-track"><div class="rdc-fill" style="width:${pct}%;background:${col}"></div></div>
+    </div>`;
   }).join('');
-  const labels = ["—","Никогда","Редко","Иногда","Часто","Всегда"];
-  const dimNames = {exhaustion:"Истощение",distance:"Дистанцирование",cognitive:"Когн.",emotional:"Эмоц.",achievement:"Достижения",mental:"Ментальное",secondary:"Вторичные"};
-  let rows = QUESTIONS.map(q => `<tr><td style="color:var(--gray);font-size:11px">${dimNames[q.dim]}</td><td>${q.text}</td><td style="text-align:center;font-weight:600">${ans[q.id]||'—'}<div style="font-size:10px;color:var(--gray);font-weight:400">${labels[ans[q.id]]||''}</div></td></tr>`).join('');
+
+  // Answer table
+  const QUESTIONS_DATA = typeof QUESTIONS !== 'undefined' ? QUESTIONS : [];
+  const scaleLabels = {1:'Совсем не согласен',2:'Скорее не согласен',3:'Иногда',4:'Скорее согласен',5:'Полностью согласен'};
+  const rows = QUESTIONS_DATA.map(q => {
+    const v = ans[q.id];
+    const label = scaleLabels[v] || '—';
+    const col = v>=4?'#E85D4A':v>=3?'#F59E0B':v<=2&&v>0?'#16A34A':'#94A3B8';
+    return `<tr>
+      <td style="color:var(--gray);font-size:11px;white-space:nowrap">${dimLabels[q.dim]}</td>
+      <td style="line-height:1.45">${q.text}</td>
+      <td style="text-align:center">
+        <span style="display:inline-block;width:28px;height:28px;border-radius:50%;background:${col};color:#fff;font-weight:700;font-size:13px;line-height:28px">${v||'—'}</span>
+        <div style="font-size:10px;color:var(--gray);margin-top:2px">${v?label:''}</div>
+      </td>
+    </tr>`;
+  }).join('');
+
+  // Comment block
+  const commentHtml = r.comment ? `
+    <div class="detail-card" style="border-left:4px solid var(--blue)">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:.75rem">
+        <span style="font-size:18px">💬</span>
+        <span style="font-size:14px;font-weight:700;color:var(--black)">Комментарий</span>
+      </div>
+      <p style="font-size:14px;color:#374151;line-height:1.7">${r.comment}</p>
+    </div>` : '';
+
   document.getElementById('detail-content').innerHTML = `
-    <div style="font-size:20px;font-weight:700;margin-bottom:.25rem">${r.name}</div>
-    <div style="font-size:13px;color:var(--gray);margin-bottom:1.25rem">${date}</div>
-    <div class="result-hero" style="text-align:center;margin-bottom:1rem">
-      <div class="result-badge" style="background:${ri.bg};border-color:${ri.border};color:${ri.text}">${ri.label}</div>
-      <div class="result-score" style="color:${ri.text}">${parseFloat(r.total||0).toFixed(1)}</div>
-      <div class="result-of5">из 125 баллов</div>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:.75rem">
+      <div>
+        <div style="font-size:22px;font-weight:800;letter-spacing:-.5px;margin-bottom:4px">${r.name}</div>
+        <div style="font-size:13px;color:var(--gray)">${r.dept} · ${date}</div>
+      </div>
+      <div style="text-align:right">
+        <span class="badge" style="background:${ri.bg};border-color:${ri.border};color:${ri.text};font-size:13px;padding:6px 16px">${r.risk} выгорание</span>
+        <div style="font-size:32px;font-weight:800;letter-spacing:-1px;color:${ri.text};margin-top:4px">${parseFloat(r.total||0).toFixed(0)}<span style="font-size:14px;color:var(--gray);font-weight:400"> / 125</span></div>
+      </div>
     </div>
-    <div class="dim-card" style="margin-bottom:1rem">${bars}</div>
-    <div class="dim-card">
-      <div class="dim-card-title">Детальные ответы</div>
-      <div style="overflow-x:auto"><table class="resp-table"><thead><tr><th>Шкала</th><th>Утверждение</th><th>Ответ</th></tr></thead><tbody>${rows}</tbody></table></div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:1rem">
+      ${dimCards}
+    </div>
+
+    ${commentHtml}
+
+    <div class="detail-card">
+      <div style="font-size:13px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.06em;margin-bottom:1rem">Детальные ответы</div>
+      <div style="overflow-x:auto">
+        <table class="resp-table">
+          <thead><tr><th>Блок</th><th>Утверждение</th><th>Ответ</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>
     </div>
   `;
   showPage('pg-detail');
