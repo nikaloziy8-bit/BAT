@@ -1019,7 +1019,7 @@ h1.intro-h1 .blue{ color:var(--blue); }
 // ══════════════════════════════════════════
 //  НАСТРОЙКА
 // ══════════════════════════════════════════
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzVT-89KctX17ES5kPJW9TYzCPocDikFvoOehHbU0oOhGy9HXGdBhPKwcNloUyhHdxyvQ/exec";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzDwLIL1wz-HumiOG3nlVMP8b5ldg0p6QcCukEfKAJwMZSDXszBRzB1IKYaNmIE_0hheg/exec";
 const ADMIN_PASSWORD = "PisyaPopaKaka";
 
 // ══════════════════════════════════════════
@@ -1437,6 +1437,9 @@ function renderList() {
       </div>
       <div class="dim-bars">${bars}</div>
       ${comment}
+      <div style="margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border);display:flex;justify-content:flex-end">
+        <button onclick="event.stopPropagation();deleteResult(${i})" style="padding:5px 12px;font-size:12px;font-weight:600;color:#E85D4A;background:#FEF2F2;border:1px solid #FECACA;border-radius:6px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s" onmouseover="this.style.background='#FEE2E2'" onmouseout="this.style.background='#FEF2F2'">🗑 Удалить</button>
+      </div>
     </div>`;
   }).join('');
 }
@@ -1541,6 +1544,27 @@ function showDetail(idx) {
     </div>
   `;
   showPage('pg-detail');
+}
+
+async function deleteResult(idx) {
+  const r = filteredData[idx];
+  if (!r) return;
+  if (!confirm(`Удалить результат ${r.name}?\nЭто действие нельзя отменить.`)) return;
+
+  try {
+    await fetch(SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({action:'delete', ts: r.ts, name: r.name})
+    });
+    // Remove from local data
+    allData = allData.filter(x => !(x.ts === r.ts && x.name === r.name));
+    renderAdminStats();
+    renderList();
+  } catch(e) {
+    alert('Ошибка при удалении. Попробуйте обновить страницу.');
+  }
 }
 
 function exportCSV() {
