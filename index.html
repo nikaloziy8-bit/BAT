@@ -1097,6 +1097,14 @@ function calcScores(ans) {
 }
 
 function showPage(id) {
+  // Block admin pages if not authenticated
+  const adminPages = ['pg-admin', 'pg-detail'];
+  if (adminPages.includes(id) && !adminAuthed) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('pg-admin-login').classList.add('active');
+    window.scrollTo(0, 0);
+    return;
+  }
   document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0, 0);
@@ -1346,6 +1354,7 @@ function adminLogin() {
 function adminLogout() { adminAuthed = false; showPage('pg-admin-login'); }
 
 async function loadAdminData() {
+  if (!adminAuthed) return;
   showPage('pg-admin');
   document.getElementById('respondents-list').innerHTML = '<div class="empty"><div class="spinner" style="margin:0 auto 1rem"></div>Загружаем данные…</div>';
   try {
@@ -1378,6 +1387,7 @@ function renderAdminStats() {
 }
 
 function renderList() {
+  if (!adminAuthed) return;
   const riskF = document.getElementById('filter-risk').value;
   const dimF  = document.getElementById('filter-dim').value;
   const deptF = document.getElementById('filter-dept').value;
@@ -1445,6 +1455,7 @@ function renderList() {
 }
 
 function showDetail(idx) {
+  if (!adminAuthed) return;
   const r = filteredData[idx];
   if (!r) return;
 
@@ -1547,6 +1558,7 @@ function showDetail(idx) {
 }
 
 async function deleteResult(idx) {
+  if (!adminAuthed) return;
   const r = filteredData[idx];
   if (!r) return;
   if (!confirm(`Удалить результат ${r.name}?\nЭто действие нельзя отменить.`)) return;
@@ -1568,6 +1580,7 @@ async function deleteResult(idx) {
 }
 
 function exportCSV() {
+  if (!adminAuthed) return;
   if (!allData.length) { alert('Нет данных'); return; }
   const dimKeys = Object.keys(DIMS);
   const header = ['Дата','Имя','Риск','Общий балл',...dimKeys.map(d=>DIMS[d].label)].join(',');
@@ -1579,7 +1592,11 @@ function exportCSV() {
   const a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='bat_playerok.csv'; a.click();
 }
 
-if (location.hash === '#admin') showPage('pg-admin-login');
+if (location.hash === '#admin') {
+  adminAuthed = false;
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('pg-admin-login').classList.add('active');
+}
 
 // Loop dialog animation
 function restartDialogAnim() {
