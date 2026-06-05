@@ -1019,8 +1019,8 @@ h1.intro-h1 .blue{ color:var(--blue); }
 // ══════════════════════════════════════════
 //  НАСТРОЙКА
 // ══════════════════════════════════════════
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzDwLIL1wz-HumiOG3nlVMP8b5ldg0p6QcCukEfKAJwMZSDXszBRzB1IKYaNmIE_0hheg/exec";
-const ADMIN_PASSWORD = "PisyaPopaKaka";
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzome35yCps8q9f3dYL8ov4SCxE5O-IbeGyF0R5abuelUH4dguht7SVCOpbruw7ahaDHQ/exec";
+// Password is verified server-side
 
 // ══════════════════════════════════════════
 const QUESTIONS = [
@@ -1073,6 +1073,7 @@ let answers = {};
 let respondentName = "";
 let respondentDept = "";
 let adminAuthed = false;
+let adminPw = "";
 let allData = [];
 let filteredData = [];
 
@@ -1340,25 +1341,39 @@ function renderPersonalResult(scores, risk) {
   `;
 }
 
-function adminLogin() {
-  if (document.getElementById('admin-pw').value === ADMIN_PASSWORD) {
-    adminAuthed = true;
-    document.getElementById('admin-pw').value = '';
-    document.getElementById('login-err').style.display = 'none';
-    loadAdminData();
-  } else {
+async function adminLogin() {
+  const pw = document.getElementById('admin-pw').value;
+  if (!pw) return;
+  const btn = document.querySelector('#pg-admin-login .btn-primary');
+  if (btn) { btn.disabled = true; btn.textContent = 'Проверяем...'; }
+
+  try {
+    const res = await fetch(`${SCRIPT_URL}?action=auth&pw=${encodeURIComponent(pw)}`);
+    const data = await res.json();
+    if (data.ok) {
+      adminAuthed = true;
+      adminPw = pw;
+      document.getElementById('admin-pw').value = '';
+      document.getElementById('login-err').style.display = 'none';
+      loadAdminData();
+    } else {
+      document.getElementById('login-err').style.display = 'block';
+    }
+  } catch(e) {
     document.getElementById('login-err').style.display = 'block';
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = 'Войти'; }
   }
 }
 
-function adminLogout() { adminAuthed = false; showPage('pg-admin-login'); }
+function adminLogout() { adminAuthed = false; adminPw = ""; showPage('pg-admin-login'); }
 
 async function loadAdminData() {
   if (!adminAuthed) return;
   showPage('pg-admin');
   document.getElementById('respondents-list').innerHTML = '<div class="empty"><div class="spinner" style="margin:0 auto 1rem"></div>Загружаем данные…</div>';
   try {
-    const res = await fetch(`${SCRIPT_URL}?action=getAll`);
+    const res = await fetch(`${SCRIPT_URL}?action=getAll&pw=${encodeURIComponent(adminPw)}`);
     allData = await res.json();
     renderAdminStats();
     renderList();
